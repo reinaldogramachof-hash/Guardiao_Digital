@@ -4,8 +4,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprendizado - Guardião Digital</title>
+    <title>Aprender - Guardião Digital</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos Específicos para o Módulo de Aprendizado */
+        .learning-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .learning-tab-btn {
+            background: transparent;
+            border: 2px solid var(--color-primary-light);
+            color: var(--color-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .learning-tab-btn.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .chat-interface {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 16px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chat-bubble.scammer {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-bubble.user {
+            background: var(--color-primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-bubble.system {
+            background: #f1f5f9;
+            color: #64748b;
+            align-self: center;
+            font-size: 0.9rem;
+            text-align: center;
+            border-radius: 8px;
+            max-width: 90%;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .quiz-container-infinite {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-card-infinite {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .quiz-option-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .quiz-option-btn:hover:not(:disabled) {
+            border-color: var(--color-primary);
+            background: #f8fafc;
+        }
+
+        .quiz-option-btn.correct {
+            background: #dcfce7 !important;
+            border-color: #16a34a !important;
+            color: #166534;
+        }
+
+        .quiz-option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -15,163 +158,99 @@
                 🛡️ GUARDIÃO <span>DIGITAL</span>
             </a>
             <nav class="nav-links">
-                <a href="index.html" class="nav-btn">
-                    Início
-                </a>
-                <a href="ferramentas.html" class="nav-btn">
-                    Ferramentas
-                </a>
-                <a href="aprendizado.html" class="nav-btn active">
-                    Aprender
-                </a>
+                <a href="index.html" class="nav-btn">Início</a>
+                <a href="ferramentas.html" class="nav-btn">Ferramentas</a>
+                <a href="aprendizado.html" class="nav-btn active">Aprender</a>
             </nav>
         </div>
     </header>
 
     <main class="container">
         <div class="mb-8 text-center">
-            <h1>Aprendizado Guiado</h1>
+            <h1>Treinamento Ativo</h1>
             <p style="font-size: 1.2rem; color: var(--color-text-light);">
-                Exercite seu cérebro e aprenda a se proteger brincando.
+                Aprenda na prática enfrentando simuladores e desafios inteligentes.
             </p>
         </div>
 
-        <div class="tab-container animate-fade-in">
-            <button class="tab-btn active" data-target="quiz-section">Quiz Interativo</button>
-            <button class="tab-btn" data-target="game-section">Caça-Palavras</button>
-            <button class="tab-btn" data-target="stories-section">Histórias Reais</button>
-            <button class="tab-btn" data-target="video-section">Vídeos Educativos</button>
+        <div class="learning-tabs">
+            <button class="learning-tab-btn active" data-tab="simulator">🤖 Simulador de Defesa</button>
+            <button class="learning-tab-btn" data-tab="quiz">🧠 Quiz Infinito</button>
         </div>
 
-        <!-- Quiz Section -->
-        <section id="quiz-section" class="learning-section animate-fade-in">
-            <div id="quiz-container">
-                <!-- Quiz content injected via JS -->
-            </div>
-        </section>
-
-        <!-- Game Section -->
-        <section id="game-section" class="learning-section hidden animate-fade-in text-center">
-            <div class="card" style="display: inline-block; text-align: center;">
-                <p class="mb-4 text-xl">Encontre as palavras: <br /><strong style="color: var(--color-accent)">SENHA,
-                        GOLPE, VIRUS, FAKE</strong></p>
-
-                <div class="word-grid">
-                    <!-- Hardcoded Grid for simplicity -->
-                    <div class="word-cell">X</div>
-                    <div class="word-cell">S</div>
-                    <div class="word-cell">E</div>
-                    <div class="word-cell">N</div>
-                    <div class="word-cell">H</div>
-                    <div class="word-cell">A</div>
-                    <div class="word-cell">O</div>
-                    <div class="word-cell">G</div>
-                    <div class="word-cell">O</div>
-                    <div class="word-cell">L</div>
-                    <div class="word-cell">P</div>
-                    <div class="word-cell">E</div>
-                    <div class="word-cell">B</div>
-                    <div class="word-cell">C</div>
-                    <div class="word-cell">A</div>
-                    <div class="word-cell">R</div>
-                    <div class="word-cell">T</div>
-                    <div class="word-cell">V</div>
-                    <div class="word-cell">I</div>
-                    <div class="word-cell">D</div>
-                    <div class="word-cell">E</div>
-                    <div class="word-cell">F</div>
-                    <div class="word-cell">A</div>
-                    <div class="word-cell">K</div>
-                    <div class="word-cell">E</div>
-                    <div class="word-cell">R</div>
-                    <div class="word-cell">U</div>
-                    <div class="word-cell">S</div>
-                    <div class="word-cell">M</div>
-                    <div class="word-cell">P</div>
-                    <div class="word-cell">R</div>
-                    <div class="word-cell">O</div>
-                    <div class="word-cell">T</div>
-                    <div class="word-cell">E</div>
-                    <div class="word-cell">J</div>
-                    <div class="word-cell">X</div>
-                    <div class="word-cell">V</div>
-                    <div class="word-cell">I</div>
-                    <div class="word-cell">R</div>
-                    <div class="word-cell">U</div>
-                    <div class="word-cell">S</div>
-                    <div class="word-cell">A</div>
-                </div>
-                <p class="mt-6 text-gray-500 italic">Toque nas letras para marcar (Simulação)</p>
-            </div>
-        </section>
-
-        <!-- NOVA SEÇÃO: Histórias Reais -->
-        <section id="stories-section" class="learning-section hidden animate-fade-in">
-            <div class="card">
-                <h3>📖 Histórias que Acontecem em São José</h3>
-                <div class="story-card"
-                    style="background: #f8fafc; padding: 2rem; border-radius: 12px; margin: 1.5rem 0;">
-                    <h4>Dona Maria, 72 anos - Golpe do Falso Neto</h4>
-                    <p>"Recebi mensagem: 'Vó, sou eu, Pedro! Preciso de R$ 2.000 urgente'. Quase transferi, mas lembrei
-                        de ligar para o número antigo dele. Era golpe!"</p>
-                    <p style="color: var(--color-safe); font-weight: bold; margin-top: 1rem;">✅ Lição: Sempre confirme
-                        por telefone conhecido</p>
+        <!-- Tab Simulador -->
+        <div id="tab-simulator" class="learning-content animate-fade-in">
+            <div class="card" style="max-width: 900px; margin: 0 auto;">
+                <div id="sim-start-screen" class="text-center" style="padding: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🎭</div>
+                    <h2>Roleplay de Segurança</h2>
+                    <p style="margin-bottom: 2rem; color: var(--color-text-light);">
+                        A Inteligência Artificial vai atuar como um golpista (ex: falso parente, gerente de banco).
+                        <br>Seu objetivo é identificar o golpe e não cair na conversa.
+                    </p>
+                    <button id="btn-start-sim" class="btn btn-primary btn-lg">Iniciar Simulação</button>
                 </div>
 
-                <div class="story-card"
-                    style="background: #f8fafc; padding: 2rem; border-radius: 12px; margin: 1.5rem 0;">
-                    <h4>Seu João, 68 anos - Falso Prêmio</h4>
-                    <p>"Ganhei 'R$ 5.000' do supermercado, mas tinha que pagar R$ 50 para liberar. Usei a ferramenta de
-                        verificação e descobri que era golpe!"</p>
-                    <p style="color: var(--color-safe); font-weight: bold; margin-top: 1rem;">✅ Lição: Nunca pague para
-                        receber prêmios</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- NOVA SEÇÃO: Vídeos -->
-        <section id="video-section" class="learning-section hidden animate-fade-in">
-            <div class="card text-center">
-                <h3>🎬 Aprenda com Vídeos Simples</h3>
-                <p>Vídeos curtos e explicativos para você se proteger</p>
-
-                <div class="video-placeholder"
-                    style="background: #e2e8f0; padding: 3rem; border-radius: 12px; margin: 2rem 0;">
-                    <div style="font-size: 4rem;">📹</div>
-                    <p style="font-weight: bold; margin: 1rem 0;">Vídeo: Como Identificar Golpes no WhatsApp</p>
-                    <p style="color: var(--color-text-light);">(Aqui seria incorporado um vídeo educativo)</p>
-                </div>
-
-                <div class="video-list" style="display: grid; gap: 1rem;">
-                    <div class="video-item"
-                        style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px;">
-                        <span style="font-size: 2rem;">1️⃣</span>
-                        <div>
-                            <strong>Criando Senhas Seguras</strong>
-                            <p style="margin: 0; color: var(--color-text-light);">5 minutos</p>
-                        </div>
+                <div id="sim-interface" class="chat-interface hidden">
+                    <div class="chat-header"
+                        style="padding: 1rem; background: var(--color-primary); color: white; display: flex; justify-content: space-between; align-items: center;">
+                        <span id="sim-scenario-title" style="font-weight: bold;">Cenário: Carregando...</span>
+                        <button id="btn-quit-sim" class="btn btn-sm"
+                            style="background: rgba(255,255,255,0.2); color: white; border: none;">Encerrar</button>
                     </div>
-                    <div class="video-item"
-                        style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px;">
-                        <span style="font-size: 2rem;">2️⃣</span>
-                        <div>
-                            <strong>Golpe do Falso Suporte Técnico</strong>
-                            <p style="margin: 0; color: var(--color-text-light);">7 minutos</p>
-                        </div>
+                    <div id="chat-messages" class="chat-messages">
+                        <!-- Mensagens vão aqui -->
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Digite sua resposta..."
+                            style="flex: 1; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+                        <button id="btn-send-chat" class="btn btn-primary">Enviar</button>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <!-- Tab Quiz -->
+        <div id="tab-quiz" class="learning-content hidden animate-fade-in">
+            <div class="quiz-container-infinite">
+                <div id="quiz-loading" class="text-center hidden">
+                    <p>Carregando nova pergunta...</p>
+                </div>
+                <div id="quiz-card" class="quiz-card-infinite">
+                    <div style="margin-bottom: 2rem;">
+                        <span
+                            style="background: var(--color-accent-light); color: var(--color-accent-hover); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: bold;">Desafio
+                            de Segurança</span>
+                    </div>
+                    <h3 id="quiz-question" style="font-size: 1.5rem; margin-bottom: 2rem;">Clique em "Começar" para
+                        gerar a primeira pergunta.</h3>
+                    <div id="quiz-options">
+                        <!-- Opções vão aqui -->
+                    </div>
+                    <div id="quiz-feedback" class="hidden"
+                        style="margin-top: 2rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <p id="quiz-explanation" style="margin-bottom: 1rem;"></p>
+                        <button id="btn-next-quiz" class="btn btn-primary">Próxima Pergunta</button>
+                    </div>
+                    <button id="btn-start-quiz" class="btn btn-primary btn-lg">Começar Quiz</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <footer>
         <div class="container">
             <div style="display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
-                <div>&copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.</div>
-                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; align-items: center;">
-                    <a href="#" class="legal-link" data-target="modal-terms" aria-label="Termos de Uso">Termos de Uso</a>
+                <div>&copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.
+                </div>
+                <div
+                    style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; align-items: center;">
+                    <a href="#" class="legal-link" data-target="modal-terms" aria-label="Termos de Uso">Termos de
+                        Uso</a>
                     <span style="opacity: 0.6;">•</span>
-                    <a href="#" class="legal-link" data-target="modal-privacy" aria-label="Política de Privacidade">Política de Privacidade</a>
+                    <a href="#" class="legal-link" data-target="modal-privacy"
+                        aria-label="Política de Privacidade">Política de Privacidade</a>
                     <span style="opacity: 0.6;">•</span>
                     <span>🔒 Site seguro: conexão protegida (HTTPS)</span>
                 </div>
@@ -186,10 +265,11 @@
                 <button class="modal-close" data-close="modal-terms" aria-label="Fechar">&times;</button>
             </div>
             <div class="modal-content">
-                <p>O Guardião Digital oferece conteúdo educativo e ferramentas de orientação para prevenção de golpes.</p>
-                <p>As análises aqui são simulações e não substituem confirmação em canais oficiais.</p>
-                <p>Em emergência: bloqueie cartões, registre boletim de ocorrência e contate autoridades.</p>
-                <p>O uso do site implica concordância com estas condições.</p>
+                <p>O Guardião Digital oferece conteúdo educativo e ferramentas de orientação para prevenção de golpes.
+                </p>
+                <p>As análises disponibilizadas aqui são simulações e não substituem confirmação em canais oficiais.</p>
+                <p>Em caso de emergência: bloqueie cartões, registre boletim de ocorrência e contate autoridades.</p>
+                <p>O uso do site implica concordância com estas condições de uso e responsabilidade pelas decisões.</p>
             </div>
         </div>
     </div>
@@ -202,8 +282,8 @@
             </div>
             <div class="modal-content">
                 <p>Este site estático não coleta dados pessoais nem armazena senhas.</p>
-                <p>Pode haver uso de fontes externas (Google Fonts). Preferir navegação segura (HTTPS).</p>
-                <p>As ferramentas são simulações; não há envio/armazenamento de arquivos.</p>
+                <p>Uso de fontes externas (Google Fonts) pode ocorrer; utilize sempre conexão segura (HTTPS).</p>
+                <p>Arquivos e entradas das ferramentas são simulações; não há envio ou armazenamento em servidores.</p>
             </div>
         </div>
     </div>

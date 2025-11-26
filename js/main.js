@@ -1,6 +1,8 @@
 // Guardião Digital - Main Logic 3.0
 // Com novas ferramentas e funcionalidades
-const API_BASE = 'http://localhost:8080';
+// Configuração da API (Descomente a linha de produção no deploy)
+// const API_BASE = 'https://us-central1-SEU-PROJETO.cloudfunctions.net/api';
+const API_BASE = 'http://localhost:8080'; // Ambiente de Desenvolvimento
 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (path.includes('ferramentas.html')) {
         initTools();
     } else if (path.includes('aprendizado.html')) {
-        initLearning();
+        initLearningAdvanced();
     } else {
         initIndex();
     }
@@ -489,11 +491,11 @@ function initTools() {
             return;
         }
         const file = files[0];
-        showResult(resultBox, 'warning', 'Extraindo texto da imagem (OCR)...');
+        showResult(resultBox, 'warning', 'Extraindo texto da imagem (Leitura Inteligente)...');
 
         const ok = await loadTesseract();
         if (!ok || !window.Tesseract) {
-            showResult(resultBox, 'warning', 'Falha ao carregar OCR. Tente novamente ou envie imagem mais nítida.');
+            showResult(resultBox, 'warning', 'Falha ao carregar sistema de leitura. Tente novamente ou envie imagem mais nítida.');
             return;
         }
 
@@ -788,133 +790,203 @@ function calculateChecklist() {
     showResult(resultBox, type, fullMessage);
 }
 
-// --- Learning Page Logic ---
-function initLearning() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const sections = document.querySelectorAll('.learning-section');
+// --- Advanced Learning Logic (AI Powered) ---
+function initLearningAdvanced() {
+    // Tab Switching
+    const tabBtns = document.querySelectorAll('.learning-tab-btn');
+    const contents = document.querySelectorAll('.learning-content');
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
-            sections.forEach(s => s.classList.add('hidden'));
-
+            contents.forEach(c => c.classList.add('hidden'));
             btn.classList.add('active');
-            document.getElementById(btn.dataset.target).classList.remove('hidden');
+            document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
         });
     });
 
-    // Quiz Logic
-    let currentQuestion = 0;
-    let score = 0;
-    const questions = [
-        {
-            q: "Um 'funcionário do banco' ligou pedindo sua senha. O que você faz?",
-            opts: ["Passo a senha", "Desligo e ligo para o gerente", "Confirmo o CPF"],
-            ans: 1
-        },
-        {
-            q: "Mensagem: 'Você ganhou R$ 6.000 da prefeitura'. O que fazer?",
-            opts: ["Clico no link", "Ignoro, é golpe", "Repasso para amigos"],
-            ans: 1
-        },
-        {
-            q: "O que é Engenharia Social?",
-            opts: ["Curso superior", "Conserto de PC", "Arte de enganar para obter dados"],
-            ans: 2
-        },
-        {
-            q: "Recebi áudio de 'neto' pedindo dinheiro. O que faço?",
-            opts: ["Transfiro rápido", "Ligo para o número antigo dele", "Pergunto no grupo da família"],
-            ans: 1
-        },
-        {
-            q: "Site pede CPF para dar prêmio. É seguro?",
-            opts: ["Sim, todos pedem", "Não, é golpe", "Só se for site conhecido"],
-            ans: 1
+    // --- Simulator Logic ---
+    const simStartScreen = document.getElementById('sim-start-screen');
+    const simInterface = document.getElementById('sim-interface');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const btnSend = document.getElementById('btn-send-chat');
+    const btnStartSim = document.getElementById('btn-start-sim');
+    const btnQuitSim = document.getElementById('btn-quit-sim');
+    const scenarioTitle = document.getElementById('sim-scenario-title');
+
+    let simHistory = [];
+    let currentScamType = '';
+
+    btnStartSim.addEventListener('click', startSimulation);
+    btnQuitSim.addEventListener('click', quitSimulation);
+    btnSend.addEventListener('click', sendReply);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendReply(); });
+
+    async function startSimulation() {
+        simStartScreen.classList.add('hidden');
+        simInterface.classList.remove('hidden');
+        chatMessages.innerHTML = '<div class="chat-bubble system">Iniciando simulação com IA...</div>';
+
+        try {
+            const res = await fetch(API_BASE + '/learning/simulation/start', { method: 'POST' });
+            if (!res.ok) throw new Error('Falha na comunicação com o sistema');
+            const data = await res.json();
+
+            currentScamType = data.scamType;
+            scenarioTitle.textContent = 'Cenário: ' + currentScamType;
+            simHistory = [{ role: 'model', parts: [{ text: data.message }] }];
+
+            chatMessages.innerHTML = '';
+            appendMessage('scammer', data.message);
+        } catch (err) {
+            alert('O sistema de simulação está indisponível no momento. Tente novamente mais tarde.');
+            quitSimulation();
         }
-    ];
+    }
 
-    const quizContainer = document.getElementById('quiz-container');
+    async function sendReply() {
+        const text = chatInput.value.trim();
+        if (!text) return;
 
-    function renderQuiz() {
-        if (currentQuestion >= questions.length) {
-            let message, icon;
-            if (score >= 4) {
-                message = "Excelente! Você está muito bem informado sobre golpes digitais.";
-                icon = "🏆";
-            } else if (score >= 3) {
-                message = "Bom! Você conhece os principais golpes, mas pode aprender mais.";
-                icon = "👍";
+        appendMessage('user', text);
+        chatInput.value = '';
+        simHistory.push({ role: 'user', parts: [{ text: text }] });
+
+        // Show typing indicator
+        const typingId = appendMessage('system', 'Golpista digitando...');
+
+        try {
+            const res = await fetch(API_BASE + '/learning/simulation/reply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    history: simHistory,
+                    userMessage: text,
+                    scamType: currentScamType
+                })
+            });
+
+            document.getElementById(typingId).remove();
+
+            if (!res.ok) throw new Error('Falha na comunicação com o sistema');
+            const data = await res.json();
+
+            if (data.status === 'ongoing') {
+                appendMessage('scammer', data.message);
+                simHistory.push({ role: 'model', parts: [{ text: data.message }] });
             } else {
-                message = "Atenção! É importante aprender mais sobre segurança digital.";
-                icon = "📚";
+                endSimulation(data.status, data.message, data.feedback);
             }
-
-            quizContainer.innerHTML = `
-                <div class="text-center animate-fade-in" style="padding: 3rem;">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">${icon}</div>
-                    <h3>${score >= 4 ? 'Parabéns!' : 'Quiz Concluído!'}</h3>
-                    <p style="font-size: 1.2rem;">${message}</p>
-                    <p style="font-size: 1.2rem;">Você acertou <strong style="color: var(--color-success)">${score}</strong> de ${questions.length} questões.</p>
-                    <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 1rem;">Tentar Novamente</button>
-                </div>
-            `;
-            return;
+        } catch (err) {
+            document.getElementById(typingId).remove();
+            appendMessage('system', 'Não conseguimos conectar ao sistema. Verifique sua internet.');
         }
+    }
 
-        const q = questions[currentQuestion];
-        let html = `
-            <div class="quiz-card animate-fade-in">
-                <div class="quiz-progress">
-                    <span style="background: var(--color-accent-light); color: var(--color-accent-hover); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">Questão ${currentQuestion + 1} de ${questions.length}</span>
+    function appendMessage(type, text) {
+        const id = 'msg-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = `chat-bubble ${type}`;
+        div.textContent = text;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return id;
+    }
+
+    function endSimulation(status, message, feedback) {
+        const isWin = status === 'success';
+        const color = isWin ? 'var(--color-success)' : 'var(--color-danger)';
+        const title = isWin ? '🏆 Você Venceu!' : '⚠️ Você Caiu no Golpe';
+
+        const html = `
+            <div class="text-center animate-fade-in" style="padding: 2rem; background: white; border-radius: 12px; margin-top: 1rem; border: 2px solid ${color}">
+                <h3 style="color: ${color}; font-size: 1.5rem;">${title}</h3>
+                <p style="font-weight: bold; margin: 1rem 0;">${message}</p>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; text-align: left;">
+                    <strong>Feedback Educativo:</strong>
+                    <p>${feedback}</p>
                 </div>
-                <h3 class="quiz-question">${q.q}</h3>
-                <div class="quiz-options">
+                <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1rem;">Tentar Outro Cenário</button>
+            </div>
         `;
 
-        q.opts.forEach((opt, idx) => {
-            html += `<button class="btn quiz-opt" data-idx="${idx}">${opt}</button>`;
-        });
+        chatMessages.innerHTML += html;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatInput.disabled = true;
+        btnSend.disabled = true;
+    }
 
-        html += `</div></div>`;
-        quizContainer.innerHTML = html;
+    function quitSimulation() {
+        simInterface.classList.add('hidden');
+        simStartScreen.classList.remove('hidden');
+        simHistory = [];
+    }
 
-        document.querySelectorAll('.quiz-opt').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const selected = parseInt(e.target.dataset.idx);
-                const isCorrect = selected === q.ans;
+    // --- Quiz Logic ---
+    const btnStartQuiz = document.getElementById('btn-start-quiz');
+    const quizQuestion = document.getElementById('quiz-question');
+    const quizOptions = document.getElementById('quiz-options');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const quizExplanation = document.getElementById('quiz-explanation');
+    const btnNextQuiz = document.getElementById('btn-next-quiz');
+    const quizLoading = document.getElementById('quiz-loading');
 
-                if (isCorrect) {
-                    score++;
-                    e.target.style.background = '#dcfce7';
-                    e.target.style.borderColor = '#16a34a';
-                    e.target.innerHTML += ' ✅';
-                } else {
-                    e.target.style.background = '#fee2e2';
-                    e.target.style.borderColor = '#dc2626';
-                    e.target.innerHTML += ' ❌';
+    btnStartQuiz.addEventListener('click', loadNextQuestion);
+    btnNextQuiz.addEventListener('click', loadNextQuestion);
 
-                    // Show correct answer
-                    document.querySelectorAll('.quiz-opt')[q.ans].style.background = '#dcfce7';
-                    document.querySelectorAll('.quiz-opt')[q.ans].style.borderColor = '#16a34a';
-                    document.querySelectorAll('.quiz-opt')[q.ans].innerHTML += ' ✅';
-                }
+    async function loadNextQuestion() {
+        btnStartQuiz.classList.add('hidden');
+        quizFeedback.classList.add('hidden');
+        quizOptions.innerHTML = '';
+        quizLoading.classList.remove('hidden');
+        quizQuestion.textContent = '';
 
-                // Disable all buttons
-                document.querySelectorAll('.quiz-opt').forEach(b => {
-                    b.disabled = true;
-                    b.style.cursor = 'not-allowed';
-                });
+        try {
+            const res = await fetch(API_BASE + '/learning/quiz');
+            if (!res.ok) throw new Error('Falha na comunicação com o sistema');
+            const data = await res.json();
 
-                setTimeout(() => {
-                    currentQuestion++;
-                    renderQuiz();
-                }, 2500);
-            });
+            quizLoading.classList.add('hidden');
+            renderQuestion(data);
+        } catch (err) {
+            quizLoading.classList.add('hidden');
+            quizQuestion.textContent = 'Erro ao carregar pergunta. Verifique sua conexão.';
+            btnStartQuiz.classList.remove('hidden');
+            btnStartQuiz.textContent = 'Tentar Novamente';
+        }
+    }
+
+    function renderQuestion(data) {
+        quizQuestion.textContent = data.question;
+
+        data.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkAnswer(idx, data.correctIndex, data.explanation, btn);
+            quizOptions.appendChild(btn);
         });
     }
 
-    renderQuiz();
+    function checkAnswer(selectedIdx, correctIdx, explanation, btnClicked) {
+        const buttons = quizOptions.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+
+        if (selectedIdx === correctIdx) {
+            btnClicked.classList.add('correct');
+            btnClicked.innerHTML += ' ✅';
+        } else {
+            btnClicked.classList.add('wrong');
+            btnClicked.innerHTML += ' ❌';
+            buttons[correctIdx].classList.add('correct');
+            buttons[correctIdx].innerHTML += ' ✅';
+        }
+
+        quizExplanation.textContent = explanation;
+        quizFeedback.classList.remove('hidden');
+    }
 }
 function initIndex() {
     document.querySelectorAll('.stat-card[role="button"]').forEach(card => {

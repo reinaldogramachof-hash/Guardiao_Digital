@@ -16,6 +16,11 @@ O sistema opera em um modelo híbrido (Validação Local + Inteligência Artific
 *   **🔑 Teste de Senha:** Avalia a força de senhas e verifica se já vazaram na internet.
 *   **🚨 Botão de Pânico:** Guia passo-a-passo do que fazer caso tenha caído em um golpe (bloqueio de cartões, BO, etc.).
 
+### 🧠 Novas Funcionalidades de IA (Revolução do Aprendizado)
+
+*   **🤖 Simulador de Defesa:** Um chat interativo onde a IA atua como um golpista (ex: Falso Filho, Gerente de Banco) e o usuário treina como não cair no golpe.
+*   **🧠 Quiz Infinito:** Perguntas geradas dinamicamente pela IA para testar o conhecimento do usuário sobre segurança digital.
+
 ## 🚀 Como Usar
 
 ### Acesso Online
@@ -37,9 +42,20 @@ Acesse diretamente pelo navegador (Desktop ou Mobile). Não requer instalação 
         ```bash
         cd backend
         npm install
+        # Crie um arquivo .env com suas credenciais do Google Cloud
         npm start
         ```
     *   O servidor rodará em `http://localhost:8080`.
+
+### Deploy (Produção)
+
+1.  **Frontend:** Pode ser hospedado em qualquer servidor estático (GitHub Pages, Vercel, Netlify).
+2.  **Backend:** Recomendado Google Cloud Functions.
+    ```bash
+    cd backend
+    gcloud functions deploy api --runtime nodejs18 --trigger-http --allow-unauthenticated
+    ```
+3.  **Configuração:** Atualize a variável `API_BASE` no arquivo `js/main.js` com a URL da sua função.
 
 ## 🔒 Segurança e Privacidade
 
