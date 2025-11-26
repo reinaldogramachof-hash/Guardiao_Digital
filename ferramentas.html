@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferramentas - Guardião Digital</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                🛡️ GUARDIÃO <span>DIGITAL</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-btn">
+                    Início
+                </a>
+                <a href="ferramentas.html" class="nav-btn active">
+                    Ferramentas
+                </a>
+                <a href="aprendizado.html" class="nav-btn">
+                    Aprender
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="mb-8 text-center">
+            <h1>Ferramentas de Proteção</h1>
+            <p style="font-size: 1.2rem; color: var(--color-text-light);">
+                Tecnologia simples para sua segurança. Selecione uma ferramenta abaixo.
+            </p>
+        </div>
+
+        <!-- Grid de Seleção -->
+        <div id="tools-grid" class="tools-grid animate-fade-in">
+            <button class="tool-card tool-btn" data-tool="link">
+                <div class="tool-icon">🔍</div>
+                <h3>Verificar Link</h3>
+                <p>Recebeu um link estranho? Cole aqui para checar.</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="password">
+                <div class="tool-icon">🔑</div>
+                <h3>Testar Senha</h3>
+                <p>Sua senha é forte? Verifique agora (Seguro).</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="print">
+                <div class="tool-icon">🖼️</div>
+                <h3>Checar Print</h3>
+                <p>Comprovante ou print suspeito? Envie para análise.</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="voice">
+                <div class="tool-icon">🎤</div>
+                <h3>Auditor de Voz</h3>
+                <p>Analise mensagens de áudio pedindo dinheiro.</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="news">
+                <div class="tool-icon">⚠️</div>
+                <h3>Fake News</h3>
+                <p>É verdade ou mentira? Verifique notícias urgentes.</p>
+            </button>
+
+            <!-- NOVAS FERRAMENTAS -->
+            <button class="tool-card tool-btn" data-tool="emergency">
+                <div class="tool-icon">🚨</div>
+                <h3>Botão do Pânico</h3>
+                <p>Contatos de emergência e o que fazer se cair em golpe</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="checklist">
+                <div class="tool-icon">✅</div>
+                <h3>Checklist de Segurança</h3>
+                <p>Lista simples para verificar sua segurança digital</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="contacts">
+                <div class="tool-icon">📞</div>
+                <h3>Contatos Seguros</h3>
+                <p>Cadastre números confiáveis para emergências</p>
+            </button>
+        </div>
+
+        <!-- Área da Ferramenta Ativa -->
+        <div id="tool-display" class="tool-display hidden">
+            <div class="tool-header">
+                <h2 id="tool-title" style="margin:0; color: white; font-size: 1.5rem;">Nome da Ferramenta</h2>
+                <button id="close-tool"
+                    style="background:none; border:none; color:white; font-size:2rem; cursor:pointer; opacity: 0.8; transition: opacity 0.2s;">&times;</button>
+            </div>
+            <div id="tool-content" class="tool-content">
+                <!-- Conteúdo injetado via JS -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

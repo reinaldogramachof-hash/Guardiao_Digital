@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendizado - Guardião Digital</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                🛡️ GUARDIÃO <span>DIGITAL</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-btn">
+                    Início
+                </a>
+                <a href="ferramentas.html" class="nav-btn">
+                    Ferramentas
+                </a>
+                <a href="aprendizado.html" class="nav-btn active">
+                    Aprender
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="mb-8 text-center">
+            <h1>Aprendizado Guiado</h1>
+            <p style="font-size: 1.2rem; color: var(--color-text-light);">
+                Exercite seu cérebro e aprenda a se proteger brincando.
+            </p>
+        </div>
+
+        <div class="tab-container animate-fade-in">
+            <button class="tab-btn active" data-target="quiz-section">Quiz Interativo</button>
+            <button class="tab-btn" data-target="game-section">Caça-Palavras</button>
+            <button class="tab-btn" data-target="stories-section">Histórias Reais</button>
+            <button class="tab-btn" data-target="video-section">Vídeos Educativos</button>
+        </div>
+
+        <!-- Quiz Section -->
+        <section id="quiz-section" class="learning-section animate-fade-in">
+            <div id="quiz-container">
+                <!-- Quiz content injected via JS -->
+            </div>
+        </section>
+
+        <!-- Game Section -->
+        <section id="game-section" class="learning-section hidden animate-fade-in text-center">
+            <div class="card" style="display: inline-block; text-align: center;">
+                <p class="mb-4 text-xl">Encontre as palavras: <br /><strong style="color: var(--color-accent)">SENHA,
+                        GOLPE, VIRUS, FAKE</strong></p>
+
+                <div class="word-grid">
+                    <!-- Hardcoded Grid for simplicity -->
+                    <div class="word-cell">X</div>
+                    <div class="word-cell">S</div>
+                    <div class="word-cell">E</div>
+                    <div class="word-cell">N</div>
+                    <div class="word-cell">H</div>
+                    <div class="word-cell">A</div>
+                    <div class="word-cell">O</div>
+                    <div class="word-cell">G</div>
+                    <div class="word-cell">O</div>
+                    <div class="word-cell">L</div>
+                    <div class="word-cell">P</div>
+                    <div class="word-cell">E</div>
+                    <div class="word-cell">B</div>
+                    <div class="word-cell">C</div>
+                    <div class="word-cell">A</div>
+                    <div class="word-cell">R</div>
+                    <div class="word-cell">T</div>
+                    <div class="word-cell">V</div>
+                    <div class="word-cell">I</div>
+                    <div class="word-cell">D</div>
+                    <div class="word-cell">E</div>
+                    <div class="word-cell">F</div>
+                    <div class="word-cell">A</div>
+                    <div class="word-cell">K</div>
+                    <div class="word-cell">E</div>
+                    <div class="word-cell">R</div>
+                    <div class="word-cell">U</div>
+                    <div class="word-cell">S</div>
+                    <div class="word-cell">M</div>
+                    <div class="word-cell">P</div>
+                    <div class="word-cell">R</div>
+                    <div class="word-cell">O</div>
+                    <div class="word-cell">T</div>
+                    <div class="word-cell">E</div>
+                    <div class="word-cell">J</div>
+                    <div class="word-cell">X</div>
+                    <div class="word-cell">V</div>
+                    <div class="word-cell">I</div>
+                    <div class="word-cell">R</div>
+                    <div class="word-cell">U</div>
+                    <div class="word-cell">S</div>
+                    <div class="word-cell">A</div>
+                </div>
+                <p class="mt-6 text-gray-500 italic">Toque nas letras para marcar (Simulação)</p>
+            </div>
+        </section>
+
+        <!-- NOVA SEÇÃO: Histórias Reais -->
+        <section id="stories-section" class="learning-section hidden animate-fade-in">
+            <div class="card">
+                <h3>📖 Histórias que Acontecem em São José</h3>
+                <div class="story-card"
+                    style="background: #f8fafc; padding: 2rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <h4>Dona Maria, 72 anos - Golpe do Falso Neto</h4>
+                    <p>"Recebi mensagem: 'Vó, sou eu, Pedro! Preciso de R$ 2.000 urgente'. Quase transferi, mas lembrei
+                        de ligar para o número antigo dele. Era golpe!"</p>
+                    <p style="color: var(--color-safe); font-weight: bold; margin-top: 1rem;">✅ Lição: Sempre confirme
+                        por telefone conhecido</p>
+                </div>
+
+                <div class="story-card"
+                    style="background: #f8fafc; padding: 2rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <h4>Seu João, 68 anos - Falso Prêmio</h4>
+                    <p>"Ganhei 'R$ 5.000' do supermercado, mas tinha que pagar R$ 50 para liberar. Usei a ferramenta de
+                        verificação e descobri que era golpe!"</p>
+                    <p style="color: var(--color-safe); font-weight: bold; margin-top: 1rem;">✅ Lição: Nunca pague para
+                        receber prêmios</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOVA SEÇÃO: Vídeos -->
+        <section id="video-section" class="learning-section hidden animate-fade-in">
+            <div class="card text-center">
+                <h3>🎬 Aprenda com Vídeos Simples</h3>
+                <p>Vídeos curtos e explicativos para você se proteger</p>
+
+                <div class="video-placeholder"
+                    style="background: #e2e8f0; padding: 3rem; border-radius: 12px; margin: 2rem 0;">
+                    <div style="font-size: 4rem;">📹</div>
+                    <p style="font-weight: bold; margin: 1rem 0;">Vídeo: Como Identificar Golpes no WhatsApp</p>
+                    <p style="color: var(--color-text-light);">(Aqui seria incorporado um vídeo educativo)</p>
+                </div>
+
+                <div class="video-list" style="display: grid; gap: 1rem;">
+                    <div class="video-item"
+                        style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px;">
+                        <span style="font-size: 2rem;">1️⃣</span>
+                        <div>
+                            <strong>Criando Senhas Seguras</strong>
+                            <p style="margin: 0; color: var(--color-text-light);">5 minutos</p>
+                        </div>
+                    </div>
+                    <div class="video-item"
+                        style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px;">
+                        <span style="font-size: 2rem;">2️⃣</span>
+                        <div>
+                            <strong>Golpe do Falso Suporte Técnico</strong>
+                            <p style="margin: 0; color: var(--color-text-light);">7 minutos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
