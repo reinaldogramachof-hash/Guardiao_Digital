@@ -166,9 +166,47 @@
 
     <footer>
         <div class="container">
-            &copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
+                <div>&copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.</div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; align-items: center;">
+                    <a href="#" class="legal-link" data-target="modal-terms" aria-label="Termos de Uso">Termos de Uso</a>
+                    <span style="opacity: 0.6;">•</span>
+                    <a href="#" class="legal-link" data-target="modal-privacy" aria-label="Política de Privacidade">Política de Privacidade</a>
+                    <span style="opacity: 0.6;">•</span>
+                    <span>🔒 Site seguro: conexão protegida (HTTPS)</span>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <div id="modal-terms" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+            <div class="modal-header">
+                <h3 id="terms-title">Termos de Uso</h3>
+                <button class="modal-close" data-close="modal-terms" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-content">
+                <p>O Guardião Digital oferece conteúdo educativo e ferramentas de orientação para prevenção de golpes.</p>
+                <p>As análises aqui são simulações e não substituem confirmação em canais oficiais.</p>
+                <p>Em emergência: bloqueie cartões, registre boletim de ocorrência e contate autoridades.</p>
+                <p>O uso do site implica concordância com estas condições.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-privacy" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+            <div class="modal-header">
+                <h3 id="privacy-title">Política de Privacidade</h3>
+                <button class="modal-close" data-close="modal-privacy" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-content">
+                <p>Este site estático não coleta dados pessoais nem armazena senhas.</p>
+                <p>Pode haver uso de fontes externas (Google Fonts). Preferir navegação segura (HTTPS).</p>
+                <p>As ferramentas são simulações; não há envio/armazenamento de arquivos.</p>
+            </div>
+        </div>
+    </div>
 
     <script src="js/main.js"></script>
 </body>

@@ -36,55 +36,60 @@
             </p>
         </div>
 
+        <div class="panic-bar" style="display:flex; justify-content:center; margin-bottom: 1.5rem;">
+            <button class="btn btn-danger legal-link" data-target="modal-emergency" style="width:100%; max-width: 980px;">
+                🚨 Botão do Pânico
+            </button>
+        </div>
+
         <!-- Grid de Seleção -->
         <div id="tools-grid" class="tools-grid animate-fade-in">
-            <button class="tool-card tool-btn" data-tool="link">
-                <div class="tool-icon">🔍</div>
-                <h3>Verificar Link</h3>
-                <p>Recebeu um link estranho? Cole aqui para checar.</p>
-            </button>
-
-            <button class="tool-card tool-btn" data-tool="password">
-                <div class="tool-icon">🔑</div>
-                <h3>Testar Senha</h3>
-                <p>Sua senha é forte? Verifique agora (Seguro).</p>
+            <button class="tool-card tool-btn" data-tool="message">
+                <div class="tool-icon">💬</div>
+                <h3>Verificar Mensagem</h3>
+                <p>Escreva uma mensagem e verifique se é golpe</p>
             </button>
 
             <button class="tool-card tool-btn" data-tool="print">
                 <div class="tool-icon">🖼️</div>
                 <h3>Checar Print</h3>
-                <p>Comprovante ou print suspeito? Envie para análise.</p>
+                <p>Comprovante ou print suspeito? Envie para análise</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="link">
+                <div class="tool-icon">🔍</div>
+                <h3>Verificador de Link</h3>
+                <p>Recebeu um link estranho? Cole aqui para checar</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="file">
+                <div class="tool-icon">📄</div>
+                <h3>Verificador de Arquivos</h3>
+                <p>Envie arquivos para checar se são seguros</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="news">
+                <div class="tool-icon">⚠️</div>
+                <h3>Verificador de Fake News</h3>
+                <p>Verifique notícias urgentes e suspeitas</p>
+            </button>
+
+            <button class="tool-card tool-btn" data-tool="password">
+                <div class="tool-icon">🔑</div>
+                <h3>Testar Senha</h3>
+                <p>Sua senha é forte? Verifique agora</p>
             </button>
 
             <button class="tool-card tool-btn" data-tool="voice">
                 <div class="tool-icon">🎤</div>
                 <h3>Auditor de Voz</h3>
-                <p>Analise mensagens de áudio pedindo dinheiro.</p>
-            </button>
-
-            <button class="tool-card tool-btn" data-tool="news">
-                <div class="tool-icon">⚠️</div>
-                <h3>Fake News</h3>
-                <p>É verdade ou mentira? Verifique notícias urgentes.</p>
-            </button>
-
-            <!-- NOVAS FERRAMENTAS -->
-            <button class="tool-card tool-btn" data-tool="emergency">
-                <div class="tool-icon">🚨</div>
-                <h3>Botão do Pânico</h3>
-                <p>Contatos de emergência e o que fazer se cair em golpe</p>
+                <p>Analise pedidos por áudio</p>
             </button>
 
             <button class="tool-card tool-btn" data-tool="checklist">
                 <div class="tool-icon">✅</div>
                 <h3>Checklist de Segurança</h3>
-                <p>Lista simples para verificar sua segurança digital</p>
-            </button>
-
-            <button class="tool-card tool-btn" data-tool="contacts">
-                <div class="tool-icon">📞</div>
-                <h3>Contatos Seguros</h3>
-                <p>Cadastre números confiáveis para emergências</p>
+                <p>Verifique seus hábitos de segurança</p>
             </button>
         </div>
 
@@ -101,13 +106,187 @@
         </div>
     </main>
 
+        <section class="animate-fade-in" style="margin-top: 2rem;">
+            <div class="card">
+                <h2>Informações Úteis</h2>
+                <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                    <div class="tool-card" style="cursor: default;">
+                        <div class="tool-icon">📞</div>
+                        <h3>Contatos Seguros</h3>
+                        <p>Cadastre números confiáveis para emergências</p>
+                        <div style="background: #f0f9ff; padding: 1rem; border-radius: 12px; margin-top: 1rem;">
+                            <div style="display: grid; gap: 0.75rem;">
+                                <div class="input-group">
+                                    <input type="text" placeholder="Nome do familiar" style="flex: 2;">
+                                    <input type="text" placeholder="Telefone" style="flex: 1;">
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" placeholder="Nome do familiar" style="flex: 2;">
+                                    <input type="text" placeholder="Telefone" style="flex: 1;">
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" placeholder="Nome do familiar" style="flex: 2;">
+                                    <input type="text" placeholder="Telefone" style="flex: 1;">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Salvar Contatos</button>
+                        </div>
+                        <div class="result-box safe" style="margin-top: 1rem;">
+                            <h4>💡 Dica</h4>
+                            <p>Compartilhe estes contatos com seus familiares para confirmar mensagens suspeitas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     <footer>
         <div class="container">
-            &copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
+                <div>&copy; 2025 Guardião Digital. Desenvolvido para proteção e educação digital da comunidade idosa.</div>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; align-items: center;">
+                    <a href="#" class="legal-link" data-target="modal-terms" aria-label="Termos de Uso">Termos de Uso</a>
+                    <span style="opacity: 0.6;">•</span>
+                    <a href="#" class="legal-link" data-target="modal-privacy" aria-label="Política de Privacidade">Política de Privacidade</a>
+                    <span style="opacity: 0.6;">•</span>
+                    <span>🔒 Site seguro: conexão protegida (HTTPS)</span>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <div id="modal-terms" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+            <div class="modal-header">
+                <h3 id="terms-title">Termos de Uso</h3>
+                <button class="modal-close" data-close="modal-terms" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-content">
+                <p>O Guardião Digital oferece conteúdo educativo e ferramentas de orientação para prevenção de golpes.</p>
+                <p>As análises disponibilizadas aqui são simulações e não substituem confirmação em canais oficiais.</p>
+                <p>Em caso de emergência: bloqueie cartões, registre boletim de ocorrência e contate autoridades.</p>
+                <p>O uso do site implica concordância com estas condições de uso e responsabilidade pelas decisões.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-privacy" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+            <div class="modal-header">
+                <h3 id="privacy-title">Política de Privacidade</h3>
+                <button class="modal-close" data-close="modal-privacy" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-content">
+                <p>Este site estático não coleta dados pessoais nem armazena senhas.</p>
+                <p>Uso de fontes externas (Google Fonts) pode ocorrer; utilize sempre conexão segura (HTTPS).</p>
+                <p>Arquivos e entradas das ferramentas são simulações; não há envio ou armazenamento em servidores.</p>
+            </div>
+        </div>
+    </div>
 
     <script src="js/main.js"></script>
 </body>
 
 </html>
+    <div id="modal-emergency" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="emergency-title">
+            <div class="modal-header">
+                <h3 id="emergency-title">🚨 Emergência</h3>
+                <div class="modal-actions">
+                    <button class="modal-back" data-close="modal-emergency" aria-label="Voltar">← Voltar para Ferramentas</button>
+                    <button class="modal-close" data-close="modal-emergency" aria-label="Fechar">&times;</button>
+                </div>
+            </div>
+            <div class="modal-content">
+                <div style="background: #fef2f2; padding: 1rem; border-radius: 12px; border-left: 6px solid var(--color-danger);">
+                    <h4 style="color: var(--color-danger);">Se caiu em golpe</h4>
+                    <p>Selecione o tipo de golpe para ver o que fazer agora.</p>
+                </div>
+
+                <div id="emergency-tabs" class="tab-container" role="tablist" style="margin-top: 1rem;">
+                    <button id="tab-parente" class="tab-btn active" role="tab" aria-selected="true" data-target="emg-parente">👨‍👦 Falso Parente</button>
+                    <button id="tab-central" class="tab-btn" role="tab" aria-selected="false" data-target="emg-central">🏦 Falsa Central</button>
+                    <button id="tab-boleto" class="tab-btn" role="tab" aria-selected="false" data-target="emg-boleto">🧾 Boleto Falso</button>
+                    <button id="tab-links" class="tab-btn" role="tab" aria-selected="false" data-target="emg-links">🔗 Links/📄 Arquivos</button>
+                    <button id="tab-suporte" class="tab-btn" role="tab" aria-selected="false" data-target="emg-suporte">🔧 Suporte Técnico Falso</button>
+                    <button id="tab-motoboy" class="tab-btn" role="tab" aria-selected="false" data-target="emg-motoboy">🛵 Motoboy (Cartão)</button>
+                    <button id="tab-whatsclone" class="tab-btn" role="tab" aria-selected="false" data-target="emg-whatsclone">📲 Clonagem de WhatsApp</button>
+                    <button id="tab-consignado" class="tab-btn" role="tab" aria-selected="false" data-target="emg-consignado">💳 Empréstimo/Consignado</button>
+                    <button id="tab-qrpix" class="tab-btn" role="tab" aria-selected="false" data-target="emg-qrpix">🔳 QR Code/PIX</button>
+                    <button id="tab-inss" class="tab-btn" role="tab" aria-selected="false" data-target="emg-inss">🧓 INSS/Benefícios</button>
+                </div>
+
+                <div id="emg-parente" class="emergency-panel" role="tabpanel" aria-labelledby="tab-parente">
+                    <div class="emergency-step"><strong>1. Confirme identidade</strong><p>Ligue para o número antigo do familiar. Peça uma prova que só ele saberia.</p></div>
+                    <div class="emergency-step"><strong>2. Bloqueie transferências</strong><p>Se fez PIX, contacte seu banco; quanto antes, melhor.</p></div>
+                    <div class="emergency-step"><strong>3. Registre BO</strong><p>Delegacia Virtual ou presencial com prints e detalhes.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-parente" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-central" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-central">
+                    <div class="emergency-step"><strong>1. Desligue a ligação</strong><p>Nunca forneça senhas/códigos. Bancos não pedem por telefone.</p></div>
+                    <div class="emergency-step"><strong>2. Ligue para o banco oficial</strong><p>Use o número do app/site oficial e relate a tentativa.</p></div>
+                    <div class="emergency-step"><strong>3. Revise o app do banco</strong><p>Troque senhas e desative dispositivos desconhecidos.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-central" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-boleto" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-boleto">
+                    <div class="emergency-step"><strong>1. Verifique beneficiário</strong><p>Compare CNPJ e nome com os dados oficiais do emissor.</p></div>
+                    <div class="emergency-step"><strong>2. Contate o emissor</strong><p>Gere um novo boleto pelo app/site e confirme valores.</p></div>
+                    <div class="emergency-step"><strong>3. Se já pagou</strong><p>Contate o banco imediatamente e registre BO.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-boleto" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-links" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-links">
+                    <div class="emergency-step"><strong>1. Pare e não clique</strong><p>Desconfie de urgência, prêmios e links encurtados.</p></div>
+                    <div class="emergency-step"><strong>2. Verifique o endereço</strong><p>Use o verificador de link e procure o cadeado (HTTPS).</p></div>
+                    <div class="emergency-step"><strong>3. Se baixou arquivo</strong><p>Não abra. Apague o download e passe antivírus.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-links" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-suporte" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-suporte">
+                    <div class="emergency-step"><strong>1. Não permita acesso remoto</strong><p>Recuse instalações de apps de acesso e encerre a ligação.</p></div>
+                    <div class="emergency-step"><strong>2. Verifique no suporte oficial</strong><p>Use canais oficiais da fabricante/banco.</p></div>
+                    <div class="emergency-step"><strong>3. Revise seu dispositivo</strong><p>Remova apps suspeitos e atualize o sistema.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-suporte" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-motoboy" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-motoboy">
+                    <div class="emergency-step"><strong>1. Não entregue o cartão</strong><p>Bancos não recolhem cartões. Desconfie de motoboy enviado.</p></div>
+                    <div class="emergency-step"><strong>2. Bloqueie imediatamente</strong><p>Ligue para o banco e bloqueie cartões e app.</p></div>
+                    <div class="emergency-step"><strong>3. Registre BO</strong><p>Tenha dados do contato recebido e horários.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-motoboy" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-whatsclone" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-whatsclone">
+                    <div class="emergency-step"><strong>1. Reative o WhatsApp</strong><p>Use o número original e o SMS para recuperar acesso.</p></div>
+                    <div class="emergency-step"><strong>2. Alerta aos contatos</strong><p>Informe que seu número foi clonado para evitar pedidos falsos.</p></div>
+                    <div class="emergency-step"><strong>3. Verifique chip/SIM</strong><p>Contate a operadora e troque senhas do e-mail.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-whatsclone" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-consignado" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-consignado">
+                    <div class="emergency-step"><strong>1. Conteste o empréstimo</strong><p>Contate o banco e registre contestação formal.</p></div>
+                    <div class="emergency-step"><strong>2. Procure o INSS</strong><p>Verifique vínculos e autorizações no Meu INSS.</p></div>
+                    <div class="emergency-step"><strong>3. Ação legal</strong><p>Registre BO e procure defesa do consumidor.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-consignado" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-qrpix" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-qrpix">
+                    <div class="emergency-step"><strong>1. Não escaneie códigos desconhecidos</strong><p>Confirme a origem do QR e o recebedor.</p></div>
+                    <div class="emergency-step"><strong>2. Se transferiu</strong><p>Contate o banco de imediato para tentativa de bloqueio.</p></div>
+                    <div class="emergency-step"><strong>3. Registre evidências</strong><p>Salve prints e mensagens para BO.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-qrpix" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <div id="emg-inss" class="emergency-panel hidden" role="tabpanel" aria-labelledby="tab-inss">
+                    <div class="emergency-step"><strong>1. Não forneça dados por telefone</strong><p>INSS não solicita senhas/códigos em ligações.</p></div>
+                    <div class="emergency-step"><strong>2. Verifique no Meu INSS</strong><p>Consulte benefícios e agendamentos oficiais.</p></div>
+                    <div class="emergency-step"><strong>3. Denuncie</strong><p>Use canais oficiais e registre BO se houve prejuízo.</p></div>
+                    <button class="btn btn-outline copy-instructions-btn" data-panel="emg-inss" style="margin-top: 0.75rem;">Copiar instruções</button>
+                </div>
+
+                <button class="btn btn-danger" style="margin-top: 1rem; width: 100%;" onclick="window.location.href='tel:190'">📞 Ligar para Polícia (190)</button>
+            </div>
+        </div>
+    </div>
