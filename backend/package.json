@@ -1,0 +1,14 @@
+{
+  "name": "guardiao-api",
+  "main": "index.js",
+  "scripts": { "start": "functions-framework --target=api" },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.0.0",
+    "@google-cloud/vertexai": "^1.1.0",
+    "@google-cloud/speech": "^6.0.0",
+    "@google-cloud/web-risk": "^4.0.0",
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0"
+  }
+}
