@@ -63,7 +63,7 @@ function removeLoader(target) {
             const r = target.querySelector && target.querySelector('.loading-row');
             if (r) r.remove();
         }
-    } catch {}
+    } catch { }
 }
 
 function analyzeMessageAdvanced(text) {
@@ -228,6 +228,27 @@ function initGlobal() {
             if (isIndex && href.includes('index.html')) b.classList.add('active');
             else if (isTools && href.includes('ferramentas.html')) b.classList.add('active');
             else if (isLearn && href.includes('aprendizado.html')) b.classList.add('active');
+        });
+    }
+
+    // Mobile Menu Logic
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    if (menuBtn && navLinks) {
+        menuBtn.addEventListener('click', () => {
+            const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+            menuBtn.setAttribute('aria-expanded', !expanded);
+            navLinks.classList.toggle('active');
+            menuBtn.textContent = expanded ? '☰' : '✕';
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navLinks.contains(e.target) && !menuBtn.contains(e.target) && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                menuBtn.setAttribute('aria-expanded', 'false');
+                menuBtn.textContent = '☰';
+            }
         });
     }
 }
@@ -818,7 +839,7 @@ function initTools() {
                 const r = target.querySelector && target.querySelector('.loading-row');
                 if (r) r.remove();
             }
-        } catch {}
+        } catch { }
     }
 
     function simulateFile() {
@@ -1029,13 +1050,13 @@ function initLearningAdvanced() {
                     scamType: currentScamType
                 })
             }, 8000, 1);
-            
+
             document.getElementById(typingId).remove();
             btnSend.disabled = false; chatInput.disabled = false;
-            
+
             if (!res.ok) throw new Error('Falha na comunicação com o sistema');
             const data = await res.json();
-            
+
             if (data.status === 'ongoing') {
                 appendMessage('scammer', data.message);
                 simHistory.push({ role: 'model', parts: [{ text: data.message }] });
@@ -1110,7 +1131,7 @@ function initLearningAdvanced() {
     const quizStatus = document.getElementById('quiz-status');
 
     let quizState = {};
-    try { quizState = JSON.parse(localStorage.getItem('quizState') || '{}'); } catch {}
+    try { quizState = JSON.parse(localStorage.getItem('quizState') || '{}'); } catch { }
     let quizCount = quizState.count || 0;
     let quizCorrect = quizState.correct || 0;
     function saveQuizState() { localStorage.setItem('quizState', JSON.stringify({ count: quizCount, correct: quizCorrect })); }
@@ -1188,7 +1209,7 @@ function initLearningAdvanced() {
             { question: 'Recebeu link de prêmio grátis. Melhor ação?', options: ['Clicar para garantir', 'Verificar o endereço e pesquisar a fonte', 'Compartilhar com amigos', 'Instalar app do prêmio'], correctIndex: 1, explanation: 'Links de prêmio são iscas. Verifique fontes confiáveis.' },
             { question: 'Parente com novo número pede dinheiro urgente. O que fazer?', options: ['Enviar o PIX', 'Pedir senha do cartão', 'Confirmar pelo número antigo', 'Passar dados bancários'], correctIndex: 2, explanation: 'Confirme identidade pelo número antigo e não transfira sob pressão.' }
         ];
-        return bank[Math.floor(Math.random()*bank.length)] || null;
+        return bank[Math.floor(Math.random() * bank.length)] || null;
     }
 
     // --- Local Simulation Fallback ---
@@ -1200,7 +1221,7 @@ function initLearningAdvanced() {
     ];
     function startLocalSimulation() {
         isLocalSim = true;
-        const sc = localScenarios[Math.floor(Math.random()*localScenarios.length)];
+        const sc = localScenarios[Math.floor(Math.random() * localScenarios.length)];
         currentScamType = sc.type;
         scenarioTitle.textContent = 'Cenário: ' + currentScamType;
         simHistory = [{ role: 'model', parts: [{ text: sc.first }] }];
@@ -1212,7 +1233,7 @@ function initLearningAdvanced() {
         localTurn++;
         const t = userText.toLowerCase();
         const safeKeywords = [
-            'desligar','vou desligar','ligar pro banco','numero antigo','número antigo','nao envio codigo','não envio código','nao passo senha','não passo senha','vou confirmar','nao cliquei','não cliquei'
+            'desligar', 'vou desligar', 'ligar pro banco', 'numero antigo', 'número antigo', 'nao envio codigo', 'não envio código', 'nao passo senha', 'não passo senha', 'vou confirmar', 'nao cliquei', 'não cliquei'
         ];
         const matchedSafe = safeKeywords.some(k => t.includes(k));
         if (matchedSafe) {
@@ -1220,7 +1241,7 @@ function initLearningAdvanced() {
             return;
         }
         const sc = localScenarios.find(s => s.type === currentScamType) || localScenarios[0];
-        const next = sc.followups[Math.min(localTurn-1, sc.followups.length-1)];
+        const next = sc.followups[Math.min(localTurn - 1, sc.followups.length - 1)];
         appendMessage('scammer', next);
         if (localTurn >= 3) {
             endSimulation('fail', 'Você forneceu ou quase forneceu dados sob pressão.', 'Desligue, nunca compartilhe códigos, e ligue para o banco no número oficial.');
@@ -1335,49 +1356,49 @@ function analyzeLinkAdvanced(url) {
     return { status, summary, reasons, tips };
 }
 
-    async function enhanceLinkWithOptionalApi(url, resultBox) {
-        const loaderRow = showLoader(resultBox, 'Analisando link...');
-        try {
-            const base = getBackendBaseUrl();
-            const res = await fetch(base + '/analyze-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
-            if (!res.ok) { removeLoader(loaderRow); return; }
-            const data = await res.json();
-            removeLoader(loaderRow);
-            if (!data || !data.status) return;
-            const extra = data.source ? 'Fonte: ' + data.source : '';
-            const msg = [data.summary || '', data.reasons ? 'Motivos: ' + data.reasons.map(x => '• ' + x).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(x => '• ' + x).join(' | ') : '', extra].filter(Boolean).join('<br><br>');
-            showResult(resultBox, data.status, msg);
-        } catch { removeLoader(loaderRow); }
-    }
+async function enhanceLinkWithOptionalApi(url, resultBox) {
+    const loaderRow = showLoader(resultBox, 'Analisando link...');
+    try {
+        const base = getBackendBaseUrl();
+        const res = await fetch(base + '/analyze-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+        if (!res.ok) { removeLoader(loaderRow); return; }
+        const data = await res.json();
+        removeLoader(loaderRow);
+        if (!data || !data.status) return;
+        const extra = data.source ? 'Fonte: ' + data.source : '';
+        const msg = [data.summary || '', data.reasons ? 'Motivos: ' + data.reasons.map(x => '• ' + x).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(x => '• ' + x).join(' | ') : '', extra].filter(Boolean).join('<br><br>');
+        showResult(resultBox, data.status, msg);
+    } catch { removeLoader(loaderRow); }
+}
 
-    async function enhanceNewsWithAI(text, resultBox) {
-        const loaderRow = showLoader(resultBox, 'Analisando notícia...');
-        try {
-            const base = getBackendBaseUrl();
-            const res = await fetch(base + '/analyze-news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
-            if (!res.ok) throw new Error('api');
-            const data = await res.json();
-            removeLoader(loaderRow);
-            const msg = [
-                '<strong>Análise Inteligente:</strong> ' + (data.summary || ''),
-                data.reasons && data.reasons.length ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '',
-                data.tips && data.tips.length ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''
-            ].filter(Boolean).join('<br><br>');
-            showResult(resultBox, data.status, msg);
-            if (data.status === 'danger') {
-                const btn = document.createElement('a');
-                btn.className = 'btn btn-secondary';
-                btn.target = '_blank';
-                btn.rel = 'noopener';
-                btn.href = 'https://www.google.com/search?q=' + encodeURIComponent(text + ' é verdade?');
-                btn.textContent = '🔍 Pesquisar no Google';
-                btn.style.marginTop = '1rem';
-                resultBox.appendChild(btn);
-            }
-        } catch {
-            removeLoader(loaderRow);
+async function enhanceNewsWithAI(text, resultBox) {
+    const loaderRow = showLoader(resultBox, 'Analisando notícia...');
+    try {
+        const base = getBackendBaseUrl();
+        const res = await fetch(base + '/analyze-news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+        if (!res.ok) throw new Error('api');
+        const data = await res.json();
+        removeLoader(loaderRow);
+        const msg = [
+            '<strong>Análise Inteligente:</strong> ' + (data.summary || ''),
+            data.reasons && data.reasons.length ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '',
+            data.tips && data.tips.length ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''
+        ].filter(Boolean).join('<br><br>');
+        showResult(resultBox, data.status, msg);
+        if (data.status === 'danger') {
+            const btn = document.createElement('a');
+            btn.className = 'btn btn-secondary';
+            btn.target = '_blank';
+            btn.rel = 'noopener';
+            btn.href = 'https://www.google.com/search?q=' + encodeURIComponent(text + ' é verdade?');
+            btn.textContent = '🔍 Pesquisar no Google';
+            btn.style.marginTop = '1rem';
+            resultBox.appendChild(btn);
         }
+    } catch {
+        removeLoader(loaderRow);
     }
+}
 
 function analyzeNewsAdvanced(title) {
     const raw = title || '';
@@ -1427,19 +1448,19 @@ async function enhanceNewsWithOptionalApi(title, resultBox) {
     } catch { }
 }
 
-    async function enhanceMessageWithAI(text, resultBox, previousStatus) {
-        const loaderRow = showLoader(resultBox, 'Analisando mensagem...');
-        try {
-            const base = getBackendBaseUrl();
-            const res = await fetch(base + '/analyze-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
-            if (!res.ok) { removeLoader(loaderRow); return; }
-            const data = await res.json();
-            removeLoader(loaderRow);
-            if (!data || !data.status) return;
-            if (previousStatus !== 'danger' && data.status === 'danger') {
-                const msg = [data.summary || 'Risco alto identificado pela análise avançada.', data.reasons ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''].filter(Boolean).join('<br><br>');
-                showResult(resultBox, 'danger', msg);
-                appendReportCTA(resultBox);
-            }
-        } catch { removeLoader(loaderRow); }
-    }
+async function enhanceMessageWithAI(text, resultBox, previousStatus) {
+    const loaderRow = showLoader(resultBox, 'Analisando mensagem...');
+    try {
+        const base = getBackendBaseUrl();
+        const res = await fetch(base + '/analyze-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+        if (!res.ok) { removeLoader(loaderRow); return; }
+        const data = await res.json();
+        removeLoader(loaderRow);
+        if (!data || !data.status) return;
+        if (previousStatus !== 'danger' && data.status === 'danger') {
+            const msg = [data.summary || 'Risco alto identificado pela análise avançada.', data.reasons ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''].filter(Boolean).join('<br><br>');
+            showResult(resultBox, 'danger', msg);
+            appendReportCTA(resultBox);
+        }
+    } catch { removeLoader(loaderRow); }
+}
