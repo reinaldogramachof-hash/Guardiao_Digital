@@ -5,12 +5,15 @@
 const API_BASE = 'http://localhost:8080'; // Ambiente de Desenvolvimento
 
 document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
     initGlobal();
 
-    if (path.includes('ferramentas.html')) {
+    const hasToolsPage = !!document.getElementById('tools-grid');
+    const hasLearningPage = !!document.querySelector('.learning-tab-btn');
+    const path = window.location.pathname || '';
+
+    if (hasToolsPage || path.includes('ferramentas.html')) {
         initTools();
-    } else if (path.includes('aprendizado.html')) {
+    } else if (hasLearningPage || path.includes('aprendizado.html')) {
         initLearningAdvanced();
     } else {
         initIndex();
@@ -30,6 +33,99 @@ function showResult(element, type, message) {
     const firstFocusable = element.querySelector('h4');
     if (firstFocusable) firstFocusable.tabIndex = -1;
     if (firstFocusable) firstFocusable.focus();
+}
+
+function getBackendBaseUrl() {
+    const cfg = window.guardianConfig && window.guardianConfig.backendBaseUrl;
+    return cfg || API_BASE;
+}
+
+function showLoader(resultBox, label) {
+    const row = document.createElement('div');
+    row.className = 'loading-row';
+    const spinner = document.createElement('span');
+    spinner.className = 'loader';
+    const text = document.createElement('span');
+    text.className = 'loader-label';
+    text.textContent = label || 'Analisando...';
+    row.appendChild(spinner);
+    row.appendChild(text);
+    resultBox.appendChild(row);
+    return row;
+}
+
+function removeLoader(target) {
+    if (!target) return;
+    try {
+        if (target.classList && target.classList.contains('loading-row')) {
+            target.remove();
+        } else {
+            const r = target.querySelector && target.querySelector('.loading-row');
+            if (r) r.remove();
+        }
+    } catch {}
+}
+
+function analyzeMessageAdvanced(text) {
+    const raw = text || '';
+    const lower = raw.toLowerCase();
+    const norm = lower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const reasons = [];
+    const tips = [];
+    const actions = [];
+    let score = 0;
+
+    const kw = ['pix', 'premio', 'taxa', 'senha', 'codigo', 'token', 'brinde', 'gratis', 'urgente', 'agora', 'imediato', 'confidencial', 'sigilo', 'novo numero', 'link', 'clique', 'motoboy', 'moto boy', 'cartao', 'cartão', 'trocar cartao', 'trocar cartão', 'recolher', 'coletar', 'bloqueado', 'cancelado', 'funcionario', 'funcionário', 'gerente do banco', 'falsa central', 'ajuda', 'socorro', 'hospital', 'policia', 'advogado', 'divida', 'emprestimo', 'tio', 'tia', 'primo', 'prima', 'vó', 'vô', 'neto', 'neta', 'sequestro', 'acidente', 'limite', 'fatura'];
+    kw.forEach(k => { if (norm.includes(k)) score += 2; });
+
+    const impersonationWords = ['mae', 'pai', 'avo', 'avo', 'neto', 'filho', 'familia'];
+    const hasImpersonation = impersonationWords.some(w => norm.includes(w)) && norm.includes('novo numero');
+    if (hasImpersonation) { score += 4; reasons.push('Possível falso parente com número novo'); }
+
+    const moneyPattern = /(r\$\s?\d+[\.,]?\d*|\d+\s?reais|\d+\s?mil)/i;
+    if (moneyPattern.test(lower)) { score += 2; reasons.push('Pedido envolvendo valores'); }
+
+    const linkPattern = /(https?:\/\/|www\.|[a-z0-9.-]+\.[a-z]{2,})(\/\S*)?/i;
+    const hasLink = linkPattern.test(raw);
+    if (hasLink) { score += 2; reasons.push('Mensagem contém link'); actions.push('Abrir Verificador de Link e conferir o endereço'); }
+
+    if (norm.includes('nao ligue') || norm.includes('nao conte')) { score += 3; reasons.push('Solicitação de sigilo'); }
+    if (norm.includes('banco') || norm.includes('gerente')) { score += 2; reasons.push('Cita banco ou gerente'); }
+    const motoboyFlow = (norm.includes('motoboy') || norm.includes('moto boy')) && (norm.includes('cartao')) && (norm.includes('trocar') || norm.includes('recolher') || norm.includes('coletar'));
+    if (motoboyFlow) {
+        score += 6;
+        reasons.push('Golpe do motoboy para recolher/trocar cartão');
+        actions.push('Não entregue seu cartão');
+        actions.push('Desligue e ligue para o banco oficial');
+    }
+    if (norm.includes('premio') || norm.includes('ganhou')) { tips.push('Desconfie de prêmios e sorteios sem inscrição'); }
+
+    if (!raw.trim()) return { status: 'warning', summary: 'Digite a mensagem para analisarmos.', reasons: [], tips: [], actions: [] };
+
+    let status = 'safe';
+    let summary = '✅ Nenhum termo suspeito encontrado na análise automática. Porém, golpistas mudam táticas diariamente. Na dúvida, NÃO clique e confirme com um familiar.';
+    if (score >= 7) { status = 'danger'; summary = 'Risco alto de golpe. Confirme em canais oficiais e com familiares.'; }
+    else if (score >= 4) { status = 'warning'; summary = 'Sinais de alerta. Verifique antes de agir.'; }
+
+    tips.push('Sempre confirme pelo número antigo da pessoa');
+    tips.push('Nunca compartilhe senhas ou códigos');
+    if (norm.includes('pix')) tips.push('Evite transferências sob pressão; ligue para um familiar');
+
+    return { status, summary, reasons, tips, actions };
+}
+
+async function fetchWithTimeoutRetry(url, options = {}, timeoutMs = 8000, retries = 0) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+        const res = await fetch(url, { ...options, signal: ctrl.signal });
+        clearTimeout(t);
+        return res;
+    } catch (e) {
+        clearTimeout(t);
+        if (retries > 0) return fetchWithTimeoutRetry(url, options, timeoutMs, retries - 1);
+        throw e;
+    }
 }
 
 function initGlobal() {
@@ -119,6 +215,21 @@ function initGlobal() {
             });
         });
     }
+
+    const navBtns = document.querySelectorAll('.nav-links .nav-btn');
+    if (navBtns.length) {
+        const p = (window.location.pathname || '').toLowerCase();
+        const isIndex = p.endsWith('/index.html') || p === '/' || p === '';
+        const isTools = p.includes('ferramentas.html');
+        const isLearn = p.includes('aprendizado.html');
+        navBtns.forEach(b => b.classList.remove('active'));
+        navBtns.forEach(b => {
+            const href = (b.getAttribute('href') || '').toLowerCase();
+            if (isIndex && href.includes('index.html')) b.classList.add('active');
+            else if (isTools && href.includes('ferramentas.html')) b.classList.add('active');
+            else if (isLearn && href.includes('aprendizado.html')) b.classList.add('active');
+        });
+    }
 }
 
 // --- Tools Page Logic ---
@@ -179,6 +290,7 @@ function initTools() {
                         <p style="font-weight: bold; font-size: 1.2rem;">Toque aqui para enviar o Print/Foto</p>
                         <small style="color: var(--color-text-light);">Como enviar: toque para selecionar a imagem do seu aparelho e aguarde a análise.</small>
                     </div>
+                    <div id="selected-print" style="color: var(--color-text-light); font-size: 0.9rem; margin-top: 0.5rem;">Nenhuma imagem selecionada</div>
                     <div id="tool-result" class="result-box hidden"></div>
                 </div>
             `
@@ -285,7 +397,14 @@ function initTools() {
             fileInput.style.display = 'none';
             dz.parentElement.appendChild(fileInput);
             dz.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', processPrintFile);
+            fileInput.addEventListener('change', (e) => {
+                const lbl = document.getElementById('selected-print');
+                if (lbl) {
+                    const f = e.target.files && e.target.files[0];
+                    lbl.textContent = f ? f.name : 'Nenhuma imagem selecionada';
+                }
+                processPrintFile(e);
+            });
             dz.addEventListener('dragenter', (e) => { e.preventDefault(); dz.classList.add('drag'); });
             dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
             dz.addEventListener('dragleave', (e) => { e.preventDefault(); dz.classList.remove('drag'); });
@@ -455,18 +574,21 @@ function initTools() {
                     try {
                         status.textContent = 'Enviando áudio para análise...';
                         resultBox.classList.remove('hidden');
+                        const loaderRow = showLoader(resultBox, 'Analisando áudio...');
                         const fd = new FormData();
                         fd.append('file', blob, 'audio.webm');
                         fd.append('languageCode', 'pt-BR');
                         const base = getBackendBaseUrl();
-                        const res = await fetch(API_BASE + '/analyze-voice', { method: 'POST', body: fd });
+                        const res = await fetch(base + '/analyze-voice', { method: 'POST', body: fd });
                         if (!res.ok) throw new Error('backend');
                         const data = await res.json();
                         const msg = [data.summary || '', data.reasons ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : '', data.transcript ? 'Transcrição: ' + data.transcript : ''].filter(Boolean).join('<br><br>');
+                        removeLoader(loaderRow);
                         showResult(resultBox, data.status || 'warning', msg);
                         if ((data.status || '') === 'danger') appendReportCTA(resultBox);
                         status.textContent = 'Toque para falar';
                     } catch {
+                        removeLoader(resultBox);
                         fallbackSpeech();
                     }
                 };
@@ -491,10 +613,11 @@ function initTools() {
             return;
         }
         const file = files[0];
-        showResult(resultBox, 'warning', 'Extraindo texto da imagem (Leitura Inteligente)...');
+        const loaderRow = showLoader(resultBox, 'Analisando imagem...');
 
         const ok = await loadTesseract();
         if (!ok || !window.Tesseract) {
+            removeLoader(loaderRow);
             showResult(resultBox, 'warning', 'Falha ao carregar sistema de leitura. Tente novamente ou envie imagem mais nítida.');
             return;
         }
@@ -503,6 +626,7 @@ function initTools() {
             const { data } = await Tesseract.recognize(file, 'por+eng', { logger: () => { } });
             const text = (data && data.text) ? data.text : '';
             if (!text.trim()) {
+                removeLoader(loaderRow);
                 showResult(resultBox, 'warning', 'Não foi possível ler o texto do print. Verifique foco/iluminação e tente novamente.');
                 return;
             }
@@ -512,11 +636,13 @@ function initTools() {
                 analysis.reasons.length ? 'Motivos: ' + analysis.reasons.map(r => '• ' + r).join(' | ') : '',
                 analysis.tips.length ? 'Dicas: ' + analysis.tips.map(t => '• ' + t).join(' | ') : ''
             ].filter(Boolean).join('<br><br>');
+            removeLoader(loaderRow);
             showResult(resultBox, analysis.status, message);
             appendShareButtons(resultBox, stripHtml(message));
             appendOcrHighlights(resultBox, text);
             if (analysis.status === 'danger') appendReportCTA(resultBox);
         } catch (err) {
+            removeLoader(loaderRow);
             showResult(resultBox, 'warning', 'Erro ao analisar a imagem. Tente novamente com outro print.');
         }
     }
@@ -669,6 +795,32 @@ function initTools() {
         resultBox.appendChild(a);
     }
 
+    function showLoader(resultBox, label) {
+        const row = document.createElement('div');
+        row.className = 'loading-row';
+        const spinner = document.createElement('span');
+        spinner.className = 'loader';
+        const text = document.createElement('span');
+        text.className = 'loader-label';
+        text.textContent = label || 'Analisando...';
+        row.appendChild(spinner);
+        row.appendChild(text);
+        resultBox.appendChild(row);
+        return row;
+    }
+
+    function removeLoader(target) {
+        if (!target) return;
+        try {
+            if (target.classList && target.classList.contains('loading-row')) {
+                target.remove();
+            } else {
+                const r = target.querySelector && target.querySelector('.loading-row');
+                if (r) r.remove();
+            }
+        } catch {}
+    }
+
     function simulateFile() {
         const input = document.getElementById('file-input');
         const resultBox = document.getElementById('tool-result');
@@ -678,8 +830,10 @@ function initTools() {
             return;
         }
         const file = input.files[0];
+        const loaderRow = showLoader(resultBox, 'Analisando arquivo...');
         const name = file.name.toLowerCase();
         setTimeout(() => {
+            removeLoader(loaderRow);
             const dangerousExts = ['.exe', '.scr', '.bat', '.com', '.cmd', '.msi', '.apk', '.jar', '.zip', '.rar', '.7z', '.tar', '.gz'];
             const isDangerous = dangerousExts.some(ext => name.endsWith(ext));
 
@@ -792,16 +946,17 @@ function calculateChecklist() {
 
 // --- Advanced Learning Logic (AI Powered) ---
 function initLearningAdvanced() {
-    // Tab Switching
     const tabBtns = document.querySelectorAll('.learning-tab-btn');
     const contents = document.querySelectorAll('.learning-content');
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            tabBtns.forEach(b => b.classList.remove('active'));
+            tabBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
             contents.forEach(c => c.classList.add('hidden'));
             btn.classList.add('active');
-            document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+            btn.setAttribute('aria-selected', 'true');
+            const panel = document.getElementById('tab-' + btn.dataset.tab);
+            if (panel) { panel.classList.remove('hidden'); const h = panel.querySelector('h2,h3'); if (h) { h.tabIndex = -1; h.focus(); } }
         });
     });
 
@@ -822,6 +977,8 @@ function initLearningAdvanced() {
     btnQuitSim.addEventListener('click', quitSimulation);
     btnSend.addEventListener('click', sendReply);
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendReply(); });
+    const btnHint = document.getElementById('btn-hint');
+    if (btnHint) btnHint.addEventListener('click', showHint);
 
     async function startSimulation() {
         simStartScreen.classList.add('hidden');
@@ -829,7 +986,7 @@ function initLearningAdvanced() {
         chatMessages.innerHTML = '<div class="chat-bubble system">Iniciando simulação com IA...</div>';
 
         try {
-            const res = await fetch(API_BASE + '/learning/simulation/start', { method: 'POST' });
+            const res = await fetchWithTimeoutRetry(API_BASE + '/learning/simulation/start', { method: 'POST' }, 8000, 1);
             if (!res.ok) throw new Error('Falha na comunicação com o sistema');
             const data = await res.json();
 
@@ -840,8 +997,7 @@ function initLearningAdvanced() {
             chatMessages.innerHTML = '';
             appendMessage('scammer', data.message);
         } catch (err) {
-            alert('O sistema de simulação está indisponível no momento. Tente novamente mais tarde.');
-            quitSimulation();
+            startLocalSimulation();
         }
     }
 
@@ -855,9 +1011,16 @@ function initLearningAdvanced() {
 
         // Show typing indicator
         const typingId = appendMessage('system', 'Golpista digitando...');
+        btnSend.disabled = true; chatInput.disabled = true;
 
         try {
-            const res = await fetch(API_BASE + '/learning/simulation/reply', {
+            if (isLocalSim) {
+                document.getElementById(typingId).remove();
+                btnSend.disabled = false; chatInput.disabled = false;
+                replyLocalSimulation(text);
+                return;
+            }
+            const res = await fetchWithTimeoutRetry(API_BASE + '/learning/simulation/reply', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -865,13 +1028,14 @@ function initLearningAdvanced() {
                     userMessage: text,
                     scamType: currentScamType
                 })
-            });
-
+            }, 8000, 1);
+            
             document.getElementById(typingId).remove();
-
+            btnSend.disabled = false; chatInput.disabled = false;
+            
             if (!res.ok) throw new Error('Falha na comunicação com o sistema');
             const data = await res.json();
-
+            
             if (data.status === 'ongoing') {
                 appendMessage('scammer', data.message);
                 simHistory.push({ role: 'model', parts: [{ text: data.message }] });
@@ -880,8 +1044,18 @@ function initLearningAdvanced() {
             }
         } catch (err) {
             document.getElementById(typingId).remove();
-            appendMessage('system', 'Não conseguimos conectar ao sistema. Verifique sua internet.');
+            appendMessage('system', 'Não conseguimos conectar ao sistema. Entrando em modo treino offline.');
+            btnSend.disabled = false; chatInput.disabled = false;
+            if (!isLocalSim) { isLocalSim = true; replyLocalSimulation(text); }
         }
+    }
+
+    function showHint() {
+        const lastModel = [...simHistory].reverse().find(h => h.role === 'model');
+        const txt = lastModel && lastModel.parts && lastModel.parts[0] && lastModel.parts[0].text ? lastModel.parts[0].text : '';
+        const res = analyzeMessageAdvanced(txt || 'Pedido de dinheiro urgente com novo número.');
+        const tip = (res.tips && res.tips[0]) || 'Confirme pelo número antigo e nunca compartilhe códigos.';
+        appendMessage('system', 'Dica: ' + tip);
     }
 
     function appendMessage(type, text) {
@@ -922,6 +1096,7 @@ function initLearningAdvanced() {
         simInterface.classList.add('hidden');
         simStartScreen.classList.remove('hidden');
         simHistory = [];
+        isLocalSim = false;
     }
 
     // --- Quiz Logic ---
@@ -932,6 +1107,15 @@ function initLearningAdvanced() {
     const quizExplanation = document.getElementById('quiz-explanation');
     const btnNextQuiz = document.getElementById('btn-next-quiz');
     const quizLoading = document.getElementById('quiz-loading');
+    const quizStatus = document.getElementById('quiz-status');
+
+    let quizState = {};
+    try { quizState = JSON.parse(localStorage.getItem('quizState') || '{}'); } catch {}
+    let quizCount = quizState.count || 0;
+    let quizCorrect = quizState.correct || 0;
+    function saveQuizState() { localStorage.setItem('quizState', JSON.stringify({ count: quizCount, correct: quizCorrect })); }
+    function updateQuizStatus() { if (quizStatus) quizStatus.textContent = 'Progresso: ' + quizCount + ' • Acertos: ' + quizCorrect; }
+    updateQuizStatus();
 
     btnStartQuiz.addEventListener('click', loadNextQuestion);
     btnNextQuiz.addEventListener('click', loadNextQuestion);
@@ -944,17 +1128,18 @@ function initLearningAdvanced() {
         quizQuestion.textContent = '';
 
         try {
-            const res = await fetch(API_BASE + '/learning/quiz');
+            const res = await fetchWithTimeoutRetry(API_BASE + '/learning/quiz');
             if (!res.ok) throw new Error('Falha na comunicação com o sistema');
             const data = await res.json();
 
             quizLoading.classList.add('hidden');
             renderQuestion(data);
+            quizCount++; saveQuizState(); updateQuizStatus();
         } catch (err) {
             quizLoading.classList.add('hidden');
-            quizQuestion.textContent = 'Erro ao carregar pergunta. Verifique sua conexão.';
-            btnStartQuiz.classList.remove('hidden');
-            btnStartQuiz.textContent = 'Tentar Novamente';
+            const data = pickFallbackQuestion();
+            if (data) { renderQuestion(data); quizCount++; saveQuizState(); updateQuizStatus(); }
+            else { quizQuestion.textContent = 'Erro ao carregar pergunta. Verifique sua conexão.'; btnStartQuiz.classList.remove('hidden'); btnStartQuiz.textContent = 'Tentar Novamente'; }
         }
     }
 
@@ -968,6 +1153,15 @@ function initLearningAdvanced() {
             btn.onclick = () => checkAnswer(idx, data.correctIndex, data.explanation, btn);
             quizOptions.appendChild(btn);
         });
+
+        const handler = (e) => {
+            const key = e.key;
+            const idx = parseInt(key, 10) - 1;
+            const buttons = quizOptions.querySelectorAll('button');
+            if (!isNaN(idx) && buttons[idx] && !quizFeedback.classList.contains('hidden')) return;
+            if (!isNaN(idx) && buttons[idx]) buttons[idx].click();
+        };
+        document.addEventListener('keydown', handler, { once: true });
     }
 
     function checkAnswer(selectedIdx, correctIdx, explanation, btnClicked) {
@@ -977,6 +1171,7 @@ function initLearningAdvanced() {
         if (selectedIdx === correctIdx) {
             btnClicked.classList.add('correct');
             btnClicked.innerHTML += ' ✅';
+            quizCorrect++; saveQuizState(); updateQuizStatus();
         } else {
             btnClicked.classList.add('wrong');
             btnClicked.innerHTML += ' ❌';
@@ -987,6 +1182,54 @@ function initLearningAdvanced() {
         quizExplanation.textContent = explanation;
         quizFeedback.classList.remove('hidden');
     }
+    function pickFallbackQuestion() {
+        const bank = [
+            { question: 'O gerente liga pedindo códigos do banco. O que fazer?', options: ['Fornecer rapidamente', 'Desligar e ligar no número oficial', 'Mandar por WhatsApp', 'Ignorar e pagar boleto'], correctIndex: 1, explanation: 'Bancos não pedem códigos por telefone. Use canais oficiais.' },
+            { question: 'Recebeu link de prêmio grátis. Melhor ação?', options: ['Clicar para garantir', 'Verificar o endereço e pesquisar a fonte', 'Compartilhar com amigos', 'Instalar app do prêmio'], correctIndex: 1, explanation: 'Links de prêmio são iscas. Verifique fontes confiáveis.' },
+            { question: 'Parente com novo número pede dinheiro urgente. O que fazer?', options: ['Enviar o PIX', 'Pedir senha do cartão', 'Confirmar pelo número antigo', 'Passar dados bancários'], correctIndex: 2, explanation: 'Confirme identidade pelo número antigo e não transfira sob pressão.' }
+        ];
+        return bank[Math.floor(Math.random()*bank.length)] || null;
+    }
+
+    // --- Local Simulation Fallback ---
+    let isLocalSim = false;
+    const localScenarios = [
+        { type: 'Falso Parente', first: 'Oi vó, mudei de número. Preciso de um PIX urgente agora!', followups: ['Rápido, é emergência! Não conte pra ninguém.', 'Me manda os códigos do banco também.'] },
+        { type: 'Falsa Central do Banco', first: 'Sou do banco. Seu app será bloqueado se não confirmar agora. Passe os códigos.', followups: ['Para sua segurança, não desligue.', 'Envie foto do cartão e senha.'] },
+        { type: 'Motoboy do Cartão', first: 'Seu cartão foi clonado. Enviaremos um motoboy para recolher e trocar.', followups: ['Ele chega em 20 minutos, separe sua senha.', 'Não fale com ninguém até lá.'] }
+    ];
+    function startLocalSimulation() {
+        isLocalSim = true;
+        const sc = localScenarios[Math.floor(Math.random()*localScenarios.length)];
+        currentScamType = sc.type;
+        scenarioTitle.textContent = 'Cenário: ' + currentScamType;
+        simHistory = [{ role: 'model', parts: [{ text: sc.first }] }];
+        chatMessages.innerHTML = '';
+        appendMessage('scammer', sc.first);
+    }
+    let localTurn = 0;
+    function replyLocalSimulation(userText) {
+        localTurn++;
+        const t = userText.toLowerCase();
+        const safeKeywords = [
+            'desligar','vou desligar','ligar pro banco','numero antigo','número antigo','nao envio codigo','não envio código','nao passo senha','não passo senha','vou confirmar','nao cliquei','não cliquei'
+        ];
+        const matchedSafe = safeKeywords.some(k => t.includes(k));
+        if (matchedSafe) {
+            endSimulation('success', 'Você tomou atitudes corretas e evitou o golpe.', 'Confirmar identidade pelo número antigo e usar canais oficiais é o caminho certo. Nunca compartilhe códigos.');
+            return;
+        }
+        const sc = localScenarios.find(s => s.type === currentScamType) || localScenarios[0];
+        const next = sc.followups[Math.min(localTurn-1, sc.followups.length-1)];
+        appendMessage('scammer', next);
+        if (localTurn >= 3) {
+            endSimulation('fail', 'Você forneceu ou quase forneceu dados sob pressão.', 'Desligue, nunca compartilhe códigos, e ligue para o banco no número oficial.');
+        }
+    }
+
+    // Input UX: habilitar Enviar somente com texto
+    btnSend.disabled = true;
+    chatInput.addEventListener('input', () => { btnSend.disabled = chatInput.value.trim().length === 0; });
 }
 function initIndex() {
     document.querySelectorAll('.stat-card[role="button"]').forEach(card => {
@@ -1092,47 +1335,49 @@ function analyzeLinkAdvanced(url) {
     return { status, summary, reasons, tips };
 }
 
-async function enhanceLinkWithOptionalApi(url, resultBox) {
-    try {
-        const res = await fetch(API_BASE + '/analyze-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data || !data.status) return;
-        const extra = data.source ? 'Fonte: ' + data.source : '';
-        const msg = [data.summary || '', data.reasons ? 'Motivos: ' + data.reasons.map(x => '• ' + x).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(x => '• ' + x).join(' | ') : '', extra].filter(Boolean).join('<br><br>');
-        showResult(resultBox, data.status, msg);
-    } catch { }
-}
-
-async function enhanceNewsWithAI(text, resultBox) {
-    const loadingP = document.createElement('p');
-    loadingP.innerHTML = '<em>🤖 Consultando bases de verificação...</em>';
-    resultBox.appendChild(loadingP);
-    try {
-        const res = await fetch(API_BASE + '/analyze-news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
-        if (!res.ok) throw new Error('api');
-        const data = await res.json();
-        loadingP.remove();
-        const msg = [
-            '<strong>Análise Inteligente:</strong> ' + (data.summary || ''),
-            data.reasons && data.reasons.length ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '',
-            data.tips && data.tips.length ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''
-        ].filter(Boolean).join('<br><br>');
-        showResult(resultBox, data.status, msg);
-        if (data.status === 'danger') {
-            const btn = document.createElement('a');
-            btn.className = 'btn btn-secondary';
-            btn.target = '_blank';
-            btn.rel = 'noopener';
-            btn.href = 'https://www.google.com/search?q=' + encodeURIComponent(text + ' é verdade?');
-            btn.textContent = '🔍 Pesquisar no Google';
-            btn.style.marginTop = '1rem';
-            resultBox.appendChild(btn);
-        }
-    } catch {
-        loadingP.remove();
+    async function enhanceLinkWithOptionalApi(url, resultBox) {
+        const loaderRow = showLoader(resultBox, 'Analisando link...');
+        try {
+            const base = getBackendBaseUrl();
+            const res = await fetch(base + '/analyze-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+            if (!res.ok) { removeLoader(loaderRow); return; }
+            const data = await res.json();
+            removeLoader(loaderRow);
+            if (!data || !data.status) return;
+            const extra = data.source ? 'Fonte: ' + data.source : '';
+            const msg = [data.summary || '', data.reasons ? 'Motivos: ' + data.reasons.map(x => '• ' + x).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(x => '• ' + x).join(' | ') : '', extra].filter(Boolean).join('<br><br>');
+            showResult(resultBox, data.status, msg);
+        } catch { removeLoader(loaderRow); }
     }
-}
+
+    async function enhanceNewsWithAI(text, resultBox) {
+        const loaderRow = showLoader(resultBox, 'Analisando notícia...');
+        try {
+            const base = getBackendBaseUrl();
+            const res = await fetch(base + '/analyze-news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+            if (!res.ok) throw new Error('api');
+            const data = await res.json();
+            removeLoader(loaderRow);
+            const msg = [
+                '<strong>Análise Inteligente:</strong> ' + (data.summary || ''),
+                data.reasons && data.reasons.length ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '',
+                data.tips && data.tips.length ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''
+            ].filter(Boolean).join('<br><br>');
+            showResult(resultBox, data.status, msg);
+            if (data.status === 'danger') {
+                const btn = document.createElement('a');
+                btn.className = 'btn btn-secondary';
+                btn.target = '_blank';
+                btn.rel = 'noopener';
+                btn.href = 'https://www.google.com/search?q=' + encodeURIComponent(text + ' é verdade?');
+                btn.textContent = '🔍 Pesquisar no Google';
+                btn.style.marginTop = '1rem';
+                resultBox.appendChild(btn);
+            }
+        } catch {
+            removeLoader(loaderRow);
+        }
+    }
 
 function analyzeNewsAdvanced(title) {
     const raw = title || '';
@@ -1182,16 +1427,19 @@ async function enhanceNewsWithOptionalApi(title, resultBox) {
     } catch { }
 }
 
-async function enhanceMessageWithAI(text, resultBox, previousStatus) {
-    try {
-        const res = await fetch(API_BASE + '/analyze-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data || !data.status) return;
-        if (previousStatus !== 'danger' && data.status === 'danger') {
-            const msg = [data.summary || 'Risco alto identificado pela análise avançada.', data.reasons ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''].filter(Boolean).join('<br><br>');
-            showResult(resultBox, 'danger', msg);
-            appendReportCTA(resultBox);
-        }
-    } catch { }
-}
+    async function enhanceMessageWithAI(text, resultBox, previousStatus) {
+        const loaderRow = showLoader(resultBox, 'Analisando mensagem...');
+        try {
+            const base = getBackendBaseUrl();
+            const res = await fetch(base + '/analyze-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+            if (!res.ok) { removeLoader(loaderRow); return; }
+            const data = await res.json();
+            removeLoader(loaderRow);
+            if (!data || !data.status) return;
+            if (previousStatus !== 'danger' && data.status === 'danger') {
+                const msg = [data.summary || 'Risco alto identificado pela análise avançada.', data.reasons ? 'Motivos: ' + data.reasons.map(r => '• ' + r).join(' | ') : '', data.tips ? 'Dicas: ' + data.tips.map(t => '• ' + t).join(' | ') : ''].filter(Boolean).join('<br><br>');
+                showResult(resultBox, 'danger', msg);
+                appendReportCTA(resultBox);
+            }
+        } catch { removeLoader(loaderRow); }
+    }

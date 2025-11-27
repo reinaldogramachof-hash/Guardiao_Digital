@@ -173,9 +173,9 @@
             </p>
         </div>
 
-        <div class="learning-tabs">
-            <button class="learning-tab-btn active" data-tab="simulator">🤖 Simulador de Defesa</button>
-            <button class="learning-tab-btn" data-tab="quiz">🧠 Quiz Infinito</button>
+        <div class="learning-tabs" role="tablist" aria-label="Módulos de Aprendizado">
+            <button class="learning-tab-btn active" role="tab" aria-selected="true" aria-controls="tab-simulator" data-tab="simulator">🤖 Simulador de Defesa</button>
+            <button class="learning-tab-btn" role="tab" aria-selected="false" aria-controls="tab-quiz" data-tab="quiz">🧠 Quiz Infinito</button>
         </div>
 
         <!-- Tab Simulador -->
@@ -192,19 +192,24 @@
                 </div>
 
                 <div id="sim-interface" class="chat-interface hidden">
-                    <div class="chat-header"
-                        style="padding: 1rem; background: var(--color-primary); color: white; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="chat-header" style="padding: 1rem; background: var(--color-primary); color: white; display: flex; justify-content: space-between; align-items: center;">
                         <span id="sim-scenario-title" style="font-weight: bold;">Cenário: Carregando...</span>
-                        <button id="btn-quit-sim" class="btn btn-sm"
-                            style="background: rgba(255,255,255,0.2); color: white; border: none;">Encerrar</button>
+                        <span id="sim-progress" style="opacity: 0.9; font-size: 0.9rem;">Sinais: 0 • Ações: 0</span>
+                        <button id="btn-quit-sim" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: none;">Encerrar</button>
                     </div>
-                    <div id="chat-messages" class="chat-messages">
+                    <div id="chat-messages" class="chat-messages" aria-live="polite">
                         <!-- Mensagens vão aqui -->
                     </div>
                     <div class="chat-input-area">
                         <input type="text" id="chat-input" placeholder="Digite sua resposta..."
                             style="flex: 1; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+                        <button id="btn-hint" class="btn btn-outline">Preciso de dica</button>
                         <button id="btn-send-chat" class="btn btn-primary">Enviar</button>
+                    </div>
+                    <div id="sim-cta" style="padding: 0.75rem; background: #fff; border-top: 1px solid #e2e8f0; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="btn-copy-sim" class="btn btn-outline">Copiar resumo</button>
+                        <a id="btn-open-tools" class="btn btn-secondary" href="ferramentas.html">Abrir Ferramentas</a>
+                        <a id="btn-call-bank" class="btn btn-outline" href="tel:">Ligar para Banco</a>
                     </div>
                 </div>
             </div>
@@ -222,12 +227,23 @@
                             style="background: var(--color-accent-light); color: var(--color-accent-hover); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: bold;">Desafio
                             de Segurança</span>
                     </div>
-                    <h3 id="quiz-question" style="font-size: 1.5rem; margin-bottom: 2rem;">Clique em "Começar" para
+                    <div id="quiz-status" style="margin-bottom: 0.75rem; color: var(--color-text-light);"></div>
+                    <div style="display:flex; gap:0.5rem; justify-content:center; margin-bottom: 1rem;">
+                        <select id="quiz-category" style="padding:0.5rem; border:1px solid #cbd5e1; border-radius:8px;">
+                            <option value="generic">Geral</option>
+                            <option value="links">Links</option>
+                            <option value="banco">Banco</option>
+                            <option value="voz">Voz</option>
+                            <option value="compras">Compras</option>
+                        </select>
+                        <button id="btn-quiz-hint" class="btn btn-outline">Dica</button>
+                    </div>
+                    <h3 id="quiz-question" aria-live="polite" style="font-size: 1.5rem; margin-bottom: 2rem;">Clique em "Começar" para
                         gerar a primeira pergunta.</h3>
                     <div id="quiz-options">
                         <!-- Opções vão aqui -->
                     </div>
-                    <div id="quiz-feedback" class="hidden"
+                    <div id="quiz-feedback" class="hidden" aria-live="polite"
                         style="margin-top: 2rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
                         <p id="quiz-explanation" style="margin-bottom: 1rem;"></p>
                         <button id="btn-next-quiz" class="btn btn-primary">Próxima Pergunta</button>
